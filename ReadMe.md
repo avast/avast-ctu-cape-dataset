@@ -32,7 +32,7 @@ Due to the size of the full CAPE logs, we have also created a collection of redu
 * Full reports (size 13 GB, [link to download](https://drive.google.com/file/d/1-bkQ4GpyS5DgXufluS1GyY57CxOao4Uf/view))
 * Reduced reports (size 566 MB, [link to download](https://drive.google.com/file/d/1Lx5e4vMN7BWZroVkxczEfcLX_pC0nLwT/view))
 
-## Example nootebook:
+## Example notebook:
 File `example/example.ipynb` shows a way for using the dataset in order to train a classifier. The example uses Julia 1.6, Mill.jl 2.7 and JsonGrinder 2.2.3. For details about julia or the main packages, please see their official documentations:
 * https://julialang.org
 * https://ctuavastlab.github.io/JsonGrinder.jl/stable/
