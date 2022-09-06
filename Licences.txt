@@ -1,0 +1,1 @@
+Source code in this repository and data files themselves that are referenced in the README.md and available for download are covered by the MIT License.
