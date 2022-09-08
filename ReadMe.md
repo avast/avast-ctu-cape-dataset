@@ -37,6 +37,21 @@ File `example/example.ipynb` shows a way for using the dataset in order to train
 * https://julialang.org
 * https://ctuavastlab.github.io/JsonGrinder.jl/stable/
 
+## Citation 
+For citing, please use the following entry for the [original paper](https://arxiv.org/abs/2209.03188):
+```
+@misc{avast-ctu-cape-dataset-2022,
+  doi = {10.48550/ARXIV.2209.03188},
+  url = {https://arxiv.org/abs/2209.03188},
+  author = {Bosansky, Branislav and Kouba, Dominik and Manhal, Ondrej and Sick, Thorsten and Lisy, Viliam and Kroustek, Jakub and Somol, Petr},
+  keywords = {Cryptography and Security (cs.CR), Artificial Intelligence (cs.AI), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {Avast-CTU Public CAPE Dataset},
+  publisher = {arXiv},
+  year = {2022},
+  copyright = {arXiv.org perpetual, non-exclusive license}
+}
+```
+
 ## Authors:
 * Branislav Bosansky (Avast / AIC, Dept. of Computer Science, FEE, CTU in Prague)
 * Dominik Kouba (AIC, Dept. of Computer Science, FEE, CTU in Prague)
