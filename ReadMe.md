@@ -29,8 +29,8 @@ We collected the logs of the samples in the time period 07-09/2021 on the CAPEv2
 
 ## Links to download:
 Due to the size of the full CAPE logs, we have also created a collection of reduced reports and thus provide two versions of dataset:
-* Full reports (size 13 GB, [link to download](https://drive.google.com/file/d/1-bkQ4GpyS5DgXufluS1GyY57CxOao4Uf/view))
-* Reduced reports (size 566 MB, [link to download](https://drive.google.com/file/d/1Lx5e4vMN7BWZroVkxczEfcLX_pC0nLwT/view))
+* Full reports (size 13 GB, [link to download](https://drive.google.com/file/d/1ItUYKtr3hmjos8Hdd_e6rohuYSRgAAId/view?usp=sharing))
+* Reduced reports (size 566 MB, [link to download](https://drive.google.com/file/d/1xujiSqV0sUv4GinS2xq8XFRpZLvvs1um/view?usp=sharing))
 
 ## Example notebook:
 File `example/example.ipynb` shows a way for using the dataset in order to train a classifier. The example uses Julia 1.6, Mill.jl 2.7 and JsonGrinder 2.2.3. For details about julia or the main packages, please see their official documentations:
