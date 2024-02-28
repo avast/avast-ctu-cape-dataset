@@ -1,0 +1,254 @@
+diff --git a/libyara/modules/cuckoo/cuckoo.c b/libyara/modules/cuckoo/cuckoo.c
+index cc69dc77..d0ddd8ee 100644
+--- a/libyara/modules/cuckoo/cuckoo.c
++++ b/libyara/modules/cuckoo/cuckoo.c
+@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ #define MODULE_NAME cuckoo
+ 
++#define API_CALL_EXTENSIVE INT64_MAX
++
+ 
+ define_function(network_dns_lookup)
+ {
+@@ -93,8 +95,7 @@ define_function(network_dns_lookup)
+     {
+       if (yr_re_match(context, regexp_argument(1), hostname) > 0)
+       {
+-        result = 1;
+-        break;
++        result++;
+       }
+     }
+   }
+@@ -131,8 +132,7 @@ uint64_t http_request(
+            (methods & METHOD_POST && strcasecmp(method, "post") == 0)) &&
+           yr_re_match(context, uri_regexp, uri) > 0)
+       {
+-        result = 1;
+-        break;
++        result++;
+       }
+     }
+   }
+@@ -181,8 +181,7 @@ define_function(network_host)
+   {
+     if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
+     {
+-      result = 1;
+-      break;
++      result++;
+     }
+   }
+ 
+@@ -215,8 +214,7 @@ define_function(network_tcp)
+       {
+         if ((int64_t) dport == integer_argument(2))
+         {
+-          result = 1;
+-          break;
++          result++;
+         }
+       }
+     }
+@@ -252,8 +250,7 @@ define_function(network_udp)
+       {
+         if ((int64_t) dport == integer_argument(2))
+         {
+-          result = 1;
+-          break;
++          result++;
+         }
+       }
+     }
+@@ -285,8 +282,7 @@ define_function(network_http_user_agent)
+     {
+       if (yr_re_match(context, regexp_argument(1), user_agent) > 0)
+       {
+-        result = 1;
+-        break;
++        result++;
+       }
+     }
+   }
+@@ -310,8 +306,7 @@ define_function(registry_key_access)
+   {
+     if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
+     {
+-      result = 1;
+-      break;
++      result++;
+     }
+   }
+ 
+@@ -334,8 +329,7 @@ define_function(filesystem_file_access)
+   {
+     if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
+     {
+-      result = 1;
+-      break;
++      result++;
+     }
+   }
+ 
+@@ -358,8 +352,43 @@ define_function(sync_mutex)
+   {
+     if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
+     {
+-      result = 1;
+-      break;
++      result++;
++    }
++  }
++
++  return_integer(result);
++}
++
++
++define_function(genrex_api_call)
++{
++  YR_OBJECT* genrex_obj = yr_parent();
++  json_t* summary_json = (json_t*) genrex_obj->data;
++  json_t* load_json = json_object_get(summary_json, "api_calls");
++
++  json_t* value;
++  int64_t result = 0;
++  size_t index;
++  const char *name;
++  json_t* count_json;
++
++  json_array_foreach(load_json, index, value)
++  {
++    name = json_string_value(json_object_get(value, "name"));
++    if (name && yr_re_match(yr_scan_context(), regexp_argument(1), name) > 0)
++    {
++      count_json = json_object_get(value, "count");
++      if (!json_is_integer(count_json))
++          continue;
++
++      json_int_t count = json_integer_value(count_json);
++      if (count == -1) // We can't have more than that so we break
++      {
++        result = API_CALL_EXTENSIVE;
++        break;
++      }
++
++      result += count;
+     }
+   }
+ 
+@@ -367,6 +396,66 @@ define_function(sync_mutex)
+ }
+ 
+ 
++define_function(genrex_atom)
++{
++  YR_SCAN_CONTEXT* context = yr_scan_context();
++  YR_OBJECT* genrex_obj = yr_parent();
++  json_t* summary_json = (json_t*) genrex_obj->data;
++  json_t* atoms_json = (json_t*) json_object_get(summary_json, "atoms");
++  json_t* value;
++  uint64_t result = 0;
++  size_t index;
++  json_array_foreach(atoms_json, index, value)
++  {
++    if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
++    {
++      result++;
++    }
++  }
++  return_integer(result);
++}
++
++
++define_function(genrex_semaphore)
++{
++  YR_SCAN_CONTEXT* context = yr_scan_context();
++  YR_OBJECT* genrex_obj = yr_parent();
++  json_t* summary_json = (json_t*) genrex_obj->data;
++  json_t* semaphores_json = (json_t*) json_object_get(summary_json, "semaphores");
++  json_t* value;
++  uint64_t result = 0;
++  size_t index;
++  json_array_foreach(semaphores_json, index, value)
++  {
++    if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
++    {
++      result++;
++    }
++  }
++  return_integer(result);
++}
++
++
++define_function(genrex_resolved_api)
++{
++  YR_SCAN_CONTEXT* context = yr_scan_context();
++  YR_OBJECT* genrex_obj = yr_parent();
++  json_t* summary_json = (json_t*) genrex_obj->data;
++  json_t* apis_json = (json_t*) json_object_get(summary_json, "resolved_apis");
++  json_t* value;
++  uint64_t result = 0;
++  size_t index;
++  json_array_foreach(apis_json, index, value)
++  {
++    if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
++    {
++      result++;
++    }
++  }
++  return_integer(result);
++}
++
++
+ begin_declarations
+   begin_struct("network")
+     declare_function("dns_lookup", "r", "i", network_dns_lookup);
+@@ -390,6 +479,14 @@ begin_declarations
+   begin_struct("sync")
+     declare_function("mutex", "r", "i", sync_mutex)
+   end_struct("sync")
++
++  begin_struct("genrex")
++    declare_integer("API_CALL_EXTENSIVE")
++    declare_function("api_call", "r", "i", genrex_api_call)
++    declare_function("atom", "r", "i", genrex_atom)
++    declare_function("resolved_api", "r", "i", genrex_resolved_api)
++    declare_function("semaphore", "r", "i", genrex_semaphore)
++  end_struct("genrex")
+ end_declarations
+ 
+ 
+@@ -415,12 +512,16 @@ int module_load(
+   YR_OBJECT* registry_obj;
+   YR_OBJECT* filesystem_obj;
+   YR_OBJECT* sync_obj;
++  YR_OBJECT* genrex_obj;
+ 
+   json_error_t json_error;
+ 
+   json_t* summary_json;
+   json_t* json;
+ 
++  yr_set_integer(API_CALL_EXTENSIVE, module_object,
++              "genrex.API_CALL_EXTENSIVE");
++
+   if (module_data == NULL)
+     return ERROR_SUCCESS;
+ 
+@@ -443,6 +544,7 @@ int module_load(
+   registry_obj = yr_get_object(module_object, "registry");
+   filesystem_obj = yr_get_object(module_object, "filesystem");
+   sync_obj = yr_get_object(module_object, "sync");
++  genrex_obj = yr_get_object(module_object, "genrex");
+ 
+   network_obj->data = (void*) json_object_get(json, "network");
+ 
+@@ -452,6 +554,7 @@ int module_load(
+   registry_obj->data = (void*) json_object_get(summary_json, "keys");
+   filesystem_obj->data = (void*) json_object_get(summary_json, "files");
+   sync_obj->data = (void*) json_object_get(summary_json, "mutexes");
++  genrex_obj->data = (void*) summary_json;
+ 
+   return ERROR_SUCCESS;
+ }
